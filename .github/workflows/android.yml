@@ -57,14 +57,33 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v5
 
-      - name: Build debug APK
-        working-directory: manager
-        run: ./gradlew --no-daemon --stacktrace :app:assembleDebug
+      - name: Configure release signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [[ -n "$KEYSTORE_BASE64" ]]; then
+            {
+              printf 'KEYSTORE_PASSWORD=%s\n' "$KEYSTORE_PASSWORD"
+              printf 'KEY_ALIAS=%s\n' "$KEY_ALIAS"
+              printf 'KEY_PASSWORD=%s\n' "$KEY_PASSWORD"
+              printf 'KEYSTORE_FILE=key.jks\n'
+            } >> manager/gradle.properties
+            printf '%s' "$KEYSTORE_BASE64" | base64 --decode > manager/key.jks
+          else
+            echo "No release keystore configured; building an unsigned release APK."
+          fi
 
-      - name: Upload debug APK
+      - name: Build release APK
+        working-directory: manager
+        run: ./gradlew --no-daemon --stacktrace :app:assembleRelease
+
+      - name: Upload release APK
         uses: actions/upload-artifact@v7
         with:
-          name: manager-debug-${{ github.sha }}
-          path: manager/app/build/outputs/apk/debug/*.apk
+          name: manager-release-${{ github.sha }}
+          path: manager/app/build/outputs/apk/release/*.apk
           if-no-files-found: error
           retention-days: 7
