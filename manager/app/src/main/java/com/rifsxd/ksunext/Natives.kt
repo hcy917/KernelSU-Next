@@ -173,7 +173,8 @@ object Natives {
         external get
 
     fun isFullFeatured(): Boolean {
-        return isManager && kernelUAPIVersion == managerUAPIVersion && com.rifsxd.ksunext.ui.util.rootAvailable()
+        // Do not hide manager features solely because the manager and kernel UAPI versions differ.
+        return isManager && com.rifsxd.ksunext.ui.util.rootAvailable()
     }
 
     val KSU_WORK_DIR = "/data/adb/ksu/"

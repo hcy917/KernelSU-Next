@@ -130,23 +130,12 @@ fun SettingScreen(navigator: DestinationsNavigator) {
         }
     }
 
-    var suCompatStatus by rememberSaveable { mutableStateOf("") }
-    var kernelUmountStatus by rememberSaveable { mutableStateOf("") }
-    var adbRootStatus by rememberSaveable { mutableStateOf("") }
-    var selinuxHideStatus by rememberSaveable { mutableStateOf("") }
     var sulogStatus by rememberSaveable { mutableStateOf("") }
     var isSulogEnabled by rememberSaveable { mutableStateOf(false) }
-    var avcSpoofStatus by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        suCompatStatus = getFeatureStatus("su_compat")
-        kernelUmountStatus = getFeatureStatus("kernel_umount")
         sulogStatus = getFeatureStatus("sulog")
         isSulogEnabled = getFeaturePersistValue("sulog") == 1L
-        adbRootStatus = getFeatureStatus("adb_root")
-
-        selinuxHideStatus = getFeatureStatus("selinux_hide")
-        avcSpoofStatus = getFeatureStatus("avc_spoof")
     }
 
     Scaffold(
@@ -176,14 +165,9 @@ fun SettingScreen(navigator: DestinationsNavigator) {
         ) {
             if (ksuVersion != null) {
                 KernelFeaturesCard(
-                    suCompatStatus = suCompatStatus,
-                    kernelUmountStatus = kernelUmountStatus,
                     sulogStatusParam = sulogStatus,
                     isSulogEnabled = isSulogEnabled,
                     onSulogEnabledChange = { isSulogEnabled = it },
-                    adbRootStatus = adbRootStatus,
-                    selinuxHideStatus = selinuxHideStatus,
-                    avcSpoofStatus = avcSpoofStatus,
                     scope = scope
                 )
                 SecurityCard(
@@ -210,23 +194,12 @@ fun SettingScreen(navigator: DestinationsNavigator) {
 
 @Composable
 private fun KernelFeaturesCard(
-    suCompatStatus: String,
-    kernelUmountStatus: String,
     sulogStatusParam: String,
     isSulogEnabled: Boolean,
     onSulogEnabledChange: (Boolean) -> Unit,
-    adbRootStatus: String,
-    selinuxHideStatus: String,
-    avcSpoofStatus: String,
     scope: kotlinx.coroutines.CoroutineScope
 ) {
     val context = LocalContext.current
-    val suCompatSupported = suCompatStatus == "supported"
-    val kernelUmountSupported = kernelUmountStatus == "supported"
-    val sulogSupported = sulogStatusParam == "supported"
-    val adbRootSupported = adbRootStatus == "supported"
-    val selinuxHideSupported = selinuxHideStatus == "supported"
-    val avcSpoofSupported = avcSpoofStatus == "supported"
 
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(
@@ -256,13 +229,9 @@ private fun KernelFeaturesCard(
             SwitchItem(
                 icon = Icons.Filled.RemoveModerator,
                 title = stringResource(R.string.settings_enable_su),
-                summary = if (suCompatSupported) {
-                    stringResource(R.string.settings_enable_su_summary)
-                } else {
-                    stringResource(id = R.string.feature_status_unsupported_summary)
-                },
+                summary = stringResource(R.string.settings_enable_su_summary),
                 checked = isSuEnabled,
-                enabled = suCompatSupported,
+                enabled = true,
                 modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)),
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent)
             ) { checked ->
@@ -280,13 +249,9 @@ private fun KernelFeaturesCard(
             SwitchItem(
                 icon = Icons.Filled.RemoveCircle,
                 title = stringResource(id = R.string.settings_enable_kernel_umount),
-                summary = if (kernelUmountSupported) {
-                    stringResource(id = R.string.settings_enable_kernel_umount_summary)
-                } else {
-                    stringResource(id = R.string.feature_status_unsupported_summary)
-                },
+                summary = stringResource(id = R.string.settings_enable_kernel_umount_summary),
                 checked = isKernelUmountEnabled,
-                enabled = kernelUmountSupported,
+                enabled = true,
                 modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)),
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent)
             ) { checked ->
@@ -298,17 +263,12 @@ private fun KernelFeaturesCard(
                 }
             }
 
-            val sulogSummary = when (sulogStatusParam) {
-                "unsupported" -> stringResource(id = R.string.feature_status_unsupported_summary)
-                "managed" -> stringResource(id = R.string.feature_status_managed_summary)
-                else -> stringResource(id = R.string.settings_sulog_summary)
-            }
             SwitchItem(
                 icon = Icons.AutoMirrored.Filled.Article,
                 title = stringResource(id = R.string.settings_sulog),
-                summary = sulogSummary,
+                summary = stringResource(id = R.string.settings_sulog_summary),
                 checked = isSulogEnabled,
-                enabled = sulogSupported,
+                enabled = true,
                 modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)),
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent)
             ) { checked ->
@@ -324,13 +284,9 @@ private fun KernelFeaturesCard(
             SwitchItem(
                 icon = Icons.Filled.Usb,
                 title = stringResource(id = R.string.settings_adb_root),
-                summary = if (adbRootSupported) {
-                    stringResource(id = R.string.settings_adb_root_summary)
-                } else {
-                    stringResource(id = R.string.feature_status_unsupported_summary)
-                },
+                summary = stringResource(id = R.string.settings_adb_root_summary),
                 checked = isAdbRootEnabled,
-                enabled = adbRootSupported,
+                enabled = true,
                 modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)),
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent)
             ) { checked ->
@@ -349,13 +305,9 @@ private fun KernelFeaturesCard(
             SwitchItem(
                 icon = Icons.Filled.Policy,
                 title = stringResource(id = R.string.settings_selinux_hide),
-                summary = if (selinuxHideSupported) {
-                    stringResource(id = R.string.settings_selinux_hide_summary)
-                } else {
-                    stringResource(id = R.string.feature_status_unsupported_summary)
-                },
+                summary = stringResource(id = R.string.settings_selinux_hide_summary),
                 checked = isSelinuxHideEnabled,
-                enabled = selinuxHideSupported,
+                enabled = true,
                 modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)),
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent)
             ) { checked ->
@@ -394,13 +346,9 @@ private fun KernelFeaturesCard(
             SwitchItem(
                 icon = Icons.Filled.Shield,
                 title = stringResource(id = R.string.settings_enable_avc_spoof),
-                summary = if (avcSpoofSupported) {
-                    stringResource(id = R.string.settings_enable_avc_spoof_summary)
-                } else {
-                    stringResource(id = R.string.feature_status_unsupported_summary)
-                },
+                summary = stringResource(id = R.string.settings_enable_avc_spoof_summary),
                 checked = isAvcSpoofEnabled,
-                enabled = avcSpoofSupported,
+                enabled = true,
                 modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)),
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent)
             ) { checked ->

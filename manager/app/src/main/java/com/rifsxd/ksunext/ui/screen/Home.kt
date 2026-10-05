@@ -104,7 +104,6 @@ fun HomeScreen(navigator: DestinationsNavigator) {
     val ksuVersion = if (isManager) Natives.version else null
     val ksuVersionTag = if (isManager) Natives.getVersionTag() else null
     val kernelUAPIVersion = if (isManager) Natives.kernelUAPIVersion else null
-    val managerUAPIVersion = Natives.managerUAPIVersion
 
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
@@ -225,33 +224,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
             }
 
             val currentVersionCode = getManagerVersion(context).second
-            val requiresNewKernel = isManager && kernelUAPIVersion != null && managerUAPIVersion > kernelUAPIVersion
-            val requiresNewManager = isManager && kernelUAPIVersion != null && managerUAPIVersion < kernelUAPIVersion
-
-            if (requiresNewKernel) {
-                WarningCard(
-                    stringResource(
-                        id = if (lkmMode == true) R.string.require_kernel_version else R.string.require_kernel_version_gki,
-                        kernelUAPIVersion!!,
-                        managerUAPIVersion
-                    ),
-                    onClick = if (lkmMode == true) {
-                        { navigator.navigate(InstallScreenDestination) }
-                    } else null
-                )
-            }
-
-            if (requiresNewManager) {
-                WarningCard(
-                    stringResource(
-                        id = R.string.require_manager_version,
-                        managerUAPIVersion,
-                        kernelUAPIVersion!!
-                    )
-                )
-            }
-
-            val showLkmUpdate = isManager && lkmMode == true && Natives.isLkmBundled && ksuVersion?.toLong() != currentVersionCode && !requiresNewKernel && !requiresNewManager
+            val showLkmUpdate = isManager && lkmMode == true && Natives.isLkmBundled && ksuVersion?.toLong() != currentVersionCode
 
             if (showLkmUpdate) {
                 WarningCard(
@@ -783,8 +756,7 @@ private fun StatusCard(
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(containerColor = run {
             if (ksuVersionParam != null) MaterialTheme.colorScheme.primary
-            else if (kernelVersionParam.isGKI()) MaterialTheme.colorScheme.secondaryContainer
-            else MaterialTheme.colorScheme.errorContainer
+            else MaterialTheme.colorScheme.secondaryContainer
         })
     ) {
         Row(
@@ -933,7 +905,7 @@ private fun StatusCard(
                     }
                 }
 
-                kernelVersionParam.isGKI() -> {
+                else -> {
                     Icon(Icons.Filled.AutoFixHigh, null)
                     Column(Modifier.padding(start = 20.dp)) {
                         Text(
@@ -943,21 +915,6 @@ private fun StatusCard(
                         Spacer(Modifier.height(4.dp))
                         Text(
                             text = stringResource(R.string.home_click_to_install),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-
-                else -> {
-                    Icon(Icons.Filled.MoodBad, null)
-                    Column(Modifier.padding(start = 20.dp)) {
-                        Text(
-                            text = stringResource(R.string.home_failure),
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = stringResource(R.string.home_failure_tip),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }

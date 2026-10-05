@@ -144,8 +144,6 @@ fun InstallScreen(navigator: DestinationsNavigator) {
         })
     }
 
-    val kernelVersion = getKernelVersion()
-
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     // Bottom bar scroll tracking
@@ -163,7 +161,7 @@ fun InstallScreen(navigator: DestinationsNavigator) {
         topBar = {
             TopBar(
                 onBack = dropUnlessResumed { navigator.popBackStack() },
-                onLkmUpload = if (kernelVersion.isGKI()) onLkmUpload else null,
+                onLkmUpload = onLkmUpload,
                 scrollBehavior = scrollBehavior
             )
         },
@@ -307,11 +305,9 @@ private fun SelectInstallMethod(
     radioOptions.add(InstallMethod.SelectFile(summary = selectFileTip))
 
     if (rootAvailable) {
-        if (kernelVersion.isGKI()) {
-            radioOptions.add(InstallMethod.DirectInstall)
-            if (isAbDevice) {
-                radioOptions.add(InstallMethod.DirectInstallToInactiveSlot)
-            }
+        radioOptions.add(InstallMethod.DirectInstall)
+        if (isAbDevice) {
+            radioOptions.add(InstallMethod.DirectInstallToInactiveSlot)
         }
 
         radioOptions.add(InstallMethod.AnyKernel())

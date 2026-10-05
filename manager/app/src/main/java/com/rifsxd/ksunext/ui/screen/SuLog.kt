@@ -376,13 +376,7 @@ private fun SulogStatusSection(
     actions: SulogActions,
 ) {
     when (state.sulogStatus) {
-        "unsupported" -> {
-            WarningCard(text = stringResource(R.string.sulog_unsupported_title))
-        }
-
-        "managed" -> {
-            WarningCard(text = stringResource(R.string.feature_status_managed_summary))
-        }
+        "unsupported", "managed" -> Unit
 
         "supported" if !state.isSulogEnabled -> {
             WarningCard(
