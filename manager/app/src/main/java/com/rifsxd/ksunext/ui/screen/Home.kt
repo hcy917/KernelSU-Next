@@ -82,6 +82,7 @@ import com.rifsxd.ksunext.ui.webui.WebUIActivity
 import com.rifsxd.ksunext.ui.util.restartActivity
 import com.rifsxd.ksunext.ui.util.module.LatestVersionInfo
 import com.rifsxd.ksunext.ui.viewmodel.ModuleViewModel
+import com.rifsxd.ksunext.ui.viewmodel.hasEnabledZygiskImplementation
 import com.rifsxd.ksunext.ui.LocalNavBarEnabled
 import com.rifsxd.ksunext.ui.LocalScrollState 
 import com.rifsxd.ksunext.ui.screen.BottomBarDestination
@@ -221,17 +222,6 @@ fun HomeScreen(navigator: DestinationsNavigator) {
                         )
                     }
                 }
-            }
-
-            val currentVersionCode = getManagerVersion(context).second
-            val showLkmUpdate = isManager && lkmMode == true && Natives.isLkmBundled && ksuVersion?.toLong() != currentVersionCode
-
-            if (showLkmUpdate) {
-                WarningCard(
-                    message = stringResource(R.string.home_lkm_update_available),
-                    color = MaterialTheme.colorScheme.tertiary,
-                    onClick = { navigator.navigate(InstallScreenDestination) }
-                )
             }
 
             if (ksuVersion != null && !rootAvailable()) {
@@ -985,8 +975,10 @@ private fun buildHomeInfoSnapshot(
     val suSFS = if (ksuVersion == null) null else getSuSFS()
     val suSFSVersion = if (suSFS == "Supported" && ksuVersion != null) getSuSFSVersion() else null
     val suSFSVariant = if (suSFS == "Supported" && ksuVersion != null) getSuSFSVariant() else null
-    val zygiskEnabled = if (ksuVersion == null) false else Natives.isZygiskEnabled()
-    val zygiskInfo = if (!zygiskEnabled) null else moduleList.firstOrNull { it.isZygisk && it.enabled }
+    val zygiskInfo = moduleList.firstOrNull { it.isZygisk && it.enabled && !it.remove }
+    val zygiskEnabled = if (ksuVersion == null) false else {
+        Natives.isZygiskEnabled() || moduleList.hasEnabledZygiskImplementation()
+    }
     val uname = kotlin.runCatching { Os.uname() }.getOrNull()
     val statusInt = kotlin.runCatching { Os.prctl(21, 0, 0, 0, 0) }.getOrDefault(-1)
     val seccompStatus = when (statusInt) {

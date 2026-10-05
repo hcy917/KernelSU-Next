@@ -228,3 +228,6 @@ class ModuleViewModel : ViewModel() {
         return Triple(zipUrl, version, changelog)
     }
 }
+
+fun List<ModuleViewModel.ModuleInfo>.hasEnabledZygiskImplementation(): Boolean =
+    any { it.isZygisk && it.enabled && !it.remove }

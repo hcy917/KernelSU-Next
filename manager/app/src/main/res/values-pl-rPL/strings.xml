@@ -306,7 +306,6 @@
   <string name="sulog_uid">UID %1$s</string>
   <string name="sulog_status_success">Powodzenie</string>
   <string name="sulog_status_exit">Wyszedł %1$d</string>
-  <string name="home_lkm_update_available">Nowszy LKM jest dostępny. Dotknij, aby zaktualizować.</string>
   <string name="home_lkm_custom">Niestandardowy</string>
   <string name="require_kernel_version_gki">Wymagany update kernela</string>
   <string name="select_language">Wybierz język</string>

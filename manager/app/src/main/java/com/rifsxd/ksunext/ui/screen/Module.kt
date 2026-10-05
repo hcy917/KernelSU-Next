@@ -83,6 +83,7 @@ import com.rifsxd.ksunext.ui.component.ShortcutDialog
 import com.rifsxd.ksunext.ui.util.module.Shortcut
 import com.rifsxd.ksunext.ui.util.*
 import com.rifsxd.ksunext.ui.viewmodel.ModuleViewModel
+import com.rifsxd.ksunext.ui.viewmodel.hasEnabledZygiskImplementation
 import com.rifsxd.ksunext.ui.webui.WebUIActivity
 import com.topjohnwu.superuser.io.SuFile
 import kotlinx.coroutines.Dispatchers
@@ -812,6 +813,7 @@ fun ModuleItem(
     onExpandToggle: () -> Unit,
 ) {
     val viewModel = viewModel<ModuleViewModel>()
+    val zygiskAvailable = Natives.isZygiskEnabled() || viewModel.moduleList.hasEnabledZygiskImplementation()
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     var showMenu by remember { mutableStateOf(false) }
     var showShortcutDialog by remember { mutableStateOf(false) }
@@ -1053,8 +1055,6 @@ fun ModuleItem(
 
                 val developerOptionsEnabled = prefs.getBoolean("enable_developer_options", false)
 
-                val filterZygiskModules = Natives.isZygiskEnabled() || !module.zygiskRequired
-
                 Column(
                     modifier = Modifier
                         .padding(22.dp, 18.dp, 22.dp, 12.dp)
@@ -1172,7 +1172,7 @@ fun ModuleItem(
                                 )
                             )
                         }
-                        if (!Natives.isZygiskEnabled() && module.zygiskRequired && !module.remove) {
+                        if (!zygiskAvailable && module.zygiskRequired && !module.remove) {
                             LabelItem(
                                 text = stringResource(R.string.zygisk_required),
                                 style = LabelItemDefaults.style.copy(
@@ -1200,7 +1200,7 @@ fun ModuleItem(
                             )
                         }
                         if (module.enabled && !module.remove) {
-                            if (module.hasWebUi && filterZygiskModules) {
+                            if (module.hasWebUi) {
                                 LabelItem(
                                     text = stringResource(R.string.webui),
                                     style = LabelItemDefaults.style.copy(
@@ -1209,7 +1209,7 @@ fun ModuleItem(
                                     )
                                 )
                             }
-                            if (module.hasActionScript && filterZygiskModules) {
+                            if (module.hasActionScript) {
                                 LabelItem(
                                     text = stringResource(R.string.action),
                                     style = LabelItemDefaults.style.copy(
@@ -1259,7 +1259,7 @@ fun ModuleItem(
                             if (module.hasActionScript) {
                                 FilledTonalButton(
                                     modifier = Modifier.defaultMinSize(52.dp, 32.dp),
-                                    enabled = !module.remove && module.enabled && filterZygiskModules,
+                                    enabled = !module.remove && module.enabled,
                                     onClick = {
                                         navigator.navigate(ExecuteModuleActionScreenDestination(module.id))
                                         viewModel.markNeedRefresh()
@@ -1287,7 +1287,7 @@ fun ModuleItem(
                             if (module.hasWebUi) {
                                 FilledTonalButton(
                                     modifier = Modifier.defaultMinSize(52.dp, 32.dp),
-                                    enabled = !module.remove && module.enabled && filterZygiskModules,
+                                    enabled = !module.remove && module.enabled,
                                     onClick = { onClick(module) },
                                     interactionSource = interactionSource,
                                     contentPadding = ButtonDefaults.TextButtonContentPadding
@@ -1315,7 +1315,7 @@ fun ModuleItem(
                                 val ctx = LocalContext.current
                                 FilledTonalButton(
                                     modifier = Modifier.defaultMinSize(52.dp, 32.dp),
-                                    enabled = !module.remove && module.enabled && filterZygiskModules,
+                                    enabled = !module.remove && module.enabled,
                                     onClick = {
                                         try {
                                             val intent = Intent(Intent.ACTION_VIEW, donateUrl.toUri())

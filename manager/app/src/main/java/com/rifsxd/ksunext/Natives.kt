@@ -80,7 +80,8 @@ object Natives {
     external fun getVersionTag(): String?
 
     /**
-     * Check if Zygisk injection is enabled in the environment.
+     * Check whether the current manager process was injected by Zygisk.
+     * This process-local signal must not be used as the system-wide Zygisk state.
      */
     external fun isZygiskEnabled(): Boolean
 

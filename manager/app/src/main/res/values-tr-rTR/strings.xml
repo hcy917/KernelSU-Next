@@ -307,7 +307,6 @@
   <string name="sulog_uid">UID %1$s</string>
   <string name="sulog_status_success">Success</string>
   <string name="sulog_status_exit">Exit %1$d</string>
-  <string name="home_lkm_update_available">Yeni bir LKM sürümü mevcut. Güncellemek için dokunun.</string>
   <string name="home_lkm_custom">Custom</string>
   <string name="require_kernel_version_gki">Çekirdek güncellemesi gerekli</string>
   <string name="select_language">Dil seçin</string>
