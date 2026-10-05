@@ -1,24 +1,34 @@
-name: Build Manager CI
+name: Build Release CI
 
 on:
   push:
     branches: [ "dev" ]
     paths:
+      - '.github/workflows/*.yml'
+      - '.github/riscv64-cargo.toml'
       - '.github/workflows/build-manager.yml'
       - '.github/workflows/build-lkm.yml'
+      - '.github/workflows/ddk-lkm.yml'
       - '.github/workflows/ksud.yml'
+      - '.github/workflows/ksuinit.yml'
       - 'manager/**'
       - 'kernel/**'
       - 'userspace/**'
+      - 'scripts/**'
   pull_request:
     branches: [ "dev" ]
     paths:
+      - '.github/workflows/*.yml'
+      - '.github/riscv64-cargo.toml'
       - '.github/workflows/build-manager.yml'
       - '.github/workflows/build-lkm.yml'
+      - '.github/workflows/ddk-lkm.yml'
       - '.github/workflows/ksud.yml'
+      - '.github/workflows/ksuinit.yml'
       - 'manager/**'
       - 'kernel/**'
       - 'userspace/**'
+      - 'scripts/**'
   workflow_call:
   workflow_dispatch:
 
